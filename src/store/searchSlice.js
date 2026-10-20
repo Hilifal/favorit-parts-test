@@ -1,14 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const API_URL = "http://api.favorit-parts.ru/hs/hsprice/";
-
 const fetchParts = async (params) => {
+  const isDev = import.meta.env.DEV;
+
   const query = new URLSearchParams({
-    key: import.meta.env.VITE_API_KEY,
+    ...(isDev ? { key: import.meta.env.VITE_API_KEY } : {}),
     ...params,
   });
 
-  const response = await fetch(`${API_URL}?${query}`);
+  const url = isDev
+    ? `http://api.favorit-parts.ru/hs/hsprice/?${query}`
+    : `/api/parts?${query}`;
+
+  const response = await fetch(url);
   const data = await response.json().catch(() => null);
 
   if (data?.error) {
